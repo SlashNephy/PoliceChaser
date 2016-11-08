@@ -1,0 +1,12 @@
+{
+    "name" : "Police Chaser",
+    "description" : "show police's assaulting phase in chat.",
+	"contact": "https://github.com/SlashNephy/PoliceChaser",
+    "author" : "SlashNephy",
+	"hooks" : [
+		{
+			"hook_id": "lib/managers/groupaimanager",
+			"script_path": "script/PoliceChaser.lua"
+		}
+	]
+}
