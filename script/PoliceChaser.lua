@@ -1,26 +1,41 @@
-require("lib/managers/group_ai_states/GroupAIStateBesiege")
-local _upd_assault_task_original = GroupAIStateBesiege._upd_assault_task
+require("lib/managers/groupaimanager")
+local _update_original = GroupAIManager.update
 
 local previous_phase
 
-function GroupAIStateBesiege:_upd_assault_task(...)
-    _upd_assault_task_original(self, ...)
+function isSupportedPhase(phase)
+    if phase == "anticipation" or phase == "fade" or phase == "build" or phase == "sustain" then
+        return true
+    end
+    return false
+end
 
-    local task = self._task_data.assault
-    local phase = task.phase
+function getFormattedPhase(phase)
+    if phase == "anticipation" then
+        return "Preparation"
+    elseif phase == "fade" then
+        return "Fade"
+    elseif phase == "build" then
+        return "Build"
+    elseif phase == "sustain" then
+        return "Sustain"
+    end
+    return "Unknown"
+end
 
-    if managers.chat then
-        if phase ~= previous_phase then
-            if phase then
-                local enemies = task.force_spawned
-                local text = string.format("Current Assault Phase: %s with %d enemies", phase, enemies)
-            else
-                local text = "Current Assault Wave has finished!"
+function GroupAIManager:update(...)
+    _update_original(self, ...)
+
+    if self._state_name == "besiege" and managers.chat then
+        local phase = getFormattedPhase(self._state._task_data.assault.phase)
+
+        if phase and phase ~= previous_phase then
+            previous_phase = phase
+
+            if isSupportedPhase(phase) then
+                local text = string.format("Current Assault Phase: %s", phase)
+                managers.chat:feed_system_message(ChatManager.GAME, text)
             end
-
-            managers.chat:feed_system_message(ChatManager.GAME, text)
         end
-
-        previous_phase = phase
     end
 end
