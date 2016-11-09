@@ -1,21 +1,26 @@
-require("lib/managers/groupaimanager")
-local _update_original = GroupAIManager.update
+require("lib/managers/group_ai_states/GroupAIStateBesiege")
+local _upd_assault_task_original = GroupAIStateBesiege._upd_assault_task
 
 local previous_phase
 
-function GroupAIManager:update(...)
-    _update_original(self, ...)
+function GroupAIStateBesiege:_upd_assault_task(...)
+    _upd_assault_task_original(self, ...)
 
-    if self._state_name == "besiege" then
-        local phase = self._state._task_data.assault.phase
-        if phase and phase ~= previous_phase then
-            previous_phase = phase
+    local task = self._task_data.assault
+    local phase = task.phase
 
-            if managers.chat then
-                local remaining = self._state._task_data.assault.phase_end_t - self._state._t
-                local text = string.format("Current Assault Phase: %s (Remaining %d secs)", phase, remaining)
-                managers.chat:feed_system_message(ChatManager.GAME, text)
+    if managers.chat then
+        if phase ~= previous_phase then
+            if phase then
+                local enemies = task.force_spawned
+                local text = string.format("Current Assault Phase: %s with %d enemies", phase, enemies)
+            else
+                local text = "Current Assault Wave has finished!"
             end
+
+            managers.chat:feed_system_message(ChatManager.GAME, text)
         end
+
+        previous_phase = phase
     end
 end
