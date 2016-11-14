@@ -5,8 +5,8 @@ end
 PoliceChaser = PoliceChaser or {}
 if not PoliceChaser.setup then
 	-- Grobal var for ext
-	PoliceChaser._pre_phase = "none"
-	PoliceChaser._current_phase = "none"
+	PoliceChaser._pre_phase = "pre"
+	PoliceChaser._current_phase = "current"
 
 	-- Grobal util var
 	PoliceChaser._path = ModPath
@@ -30,6 +30,7 @@ if not PoliceChaser.setup then
 	end
 
 	function PoliceChaser:ReceiveChatMessage(prefix, message, color)
+	log("called")
     	if not message then
         	message = prefix
             prefix = nil
@@ -38,9 +39,11 @@ if not PoliceChaser.setup then
         	color = nil
     	end
     	message = tostring(message)
+		log("to str")
     	if managers and managers.chat and managers.chat._receivers and managers.chat._receivers[1] then
         	for __, rcvr in pairs(managers.chat._receivers[1]) do
             	rcvr:receive_message(prefix or "*", message, color or tweak_data.chat_colors[5]) 
+				log("for")
         	end  
       	end
 	end
